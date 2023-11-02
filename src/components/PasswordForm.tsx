@@ -18,11 +18,24 @@ import { Input } from "@/components/ui/input";
 import { useTransition } from "react";
 import { useToast } from "./ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { savePassword } from "@/app/actions";
 
 const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
+  passwd: z
+    .string()
+    .min(8, {
+      message: "La contraseña debe de contener por los menos 8 caracteres",
+    })
+    .refine(
+      (value) =>
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(
+          value
+        ),
+      {
+        message:
+          "La contraseña debe contener al menos una letra mayúscula, \nuna letra minúscula, \nun carácter especial \ny un número.",
+      }
+    ),
 });
 
 export function PasswordForm() {
@@ -31,18 +44,25 @@ export function PasswordForm() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      passwd: "",
+    },
   });
 
-  const onSubmit = async (datos: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     startTransition(async () => {
       try {
-        datos.username = datos.username.trim();
-        form.reset(datos);
+        data.passwd = data.passwd.trim();
+        await savePassword(data);
+        form.reset();
+        toast({
+          title: "Contraseña Guardada",
+        });
       } catch (err) {
         if (err instanceof Error)
           toast({
             variant: "destructive",
-            title: "Hubo un error al intentar actualizar tus datos.",
+            title: "Hubo un error al intentar guardar la contraseña.",
             description: err.message,
           });
       }
@@ -51,15 +71,18 @@ export function PasswordForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 w-1/4 min-w-[320px]"
+      >
         <FormField
           control={form.control}
-          name="username"
+          name="passwd"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Contraseña</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -72,7 +95,7 @@ export function PasswordForm() {
           variant="outline"
         >
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Siguiente
+          Guardar
         </Button>
       </form>
     </Form>
