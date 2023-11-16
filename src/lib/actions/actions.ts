@@ -66,3 +66,30 @@ export async function InsertToken(email: string, token: string) {
     throw new Error("No se pudo registrar el usuario");
   }
 }
+
+export async function validateUser(email: string, token: string) {
+  const hashedToken = await bcrypt.hash(token, 10);
+  try {
+    const query = await prisma.user.findMany({
+      where: {
+        email: email,
+        token: hashedToken,
+      },
+    });
+    if (!query) {
+      throw new Error("No se pudo validar el token");
+    }
+
+    await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        isValidated: true,
+      },
+    });
+  } catch (e) {
+    console.error("Error saving password:", e);
+    throw new Error("No se pudo registrar el usuario");
+  }
+}
