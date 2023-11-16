@@ -18,53 +18,36 @@ import { Input } from "@/components/ui/input";
 import { useTransition } from "react";
 import { useToast } from "./ui/use-toast";
 import { Loader2 } from "lucide-react";
-import { savePassword } from "@/app/actions";
-
-const formSchema = z.object({
-  passwd: z
-    .string()
-    .min(8, {
-      message: "La contraseña debe de contener por los menos 8 caracteres",
-    })
-    .refine(
-      (value) =>
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(
-          value
-        ),
-      {
-        message:
-          "La contraseña debe contener al menos una letra mayúscula, \nuna letra minúscula, \nun carácter especial \ny un número.",
-      }
-    ),
-  email: z.string().email("Correo electronico no valido"),
-});
+import { createUser } from "@/lib/actions/actions";
+import { useRouter } from "next/navigation";
+import { userFormSchema } from "@/lib/validations/validations";
+import { sendVerificationRequest } from "@/app/api/auth/authemail";
 
 export function SignUpForm() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof userFormSchema>>({
+    resolver: zodResolver(userFormSchema),
     defaultValues: {
       passwd: "",
       email: "",
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof userFormSchema>) => {
     startTransition(async () => {
       try {
         data.passwd = data.passwd.trim();
-        await savePassword(data);
-        form.reset();
-        toast({
-          title: "Contraseña Guardada",
-        });
+        data.email = data.email.trim();
+        await createUser(data);
+        await sendVerificationRequest(data.email);
       } catch (err) {
         if (err instanceof Error)
           toast({
             variant: "destructive",
-            title: "Hubo un error al intentar guardar la contraseña.",
+            title: "Hubo un error al intentar registrar el usuario",
             description: err.message,
           });
       }

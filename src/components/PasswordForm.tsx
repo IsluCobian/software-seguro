@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useTransition } from "react";
 import { useToast } from "./ui/use-toast";
 import { Loader2 } from "lucide-react";
-import { savePassword } from "@/app/actions";
+import { savePassword } from "@/lib/actions/actions";
 
 const formSchema = z.object({
   passwd: z
