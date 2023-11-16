@@ -20,4 +20,5 @@ model User {
   email String
   password String 
   token String?
+  isVerified Boolean @default(false)
 }
