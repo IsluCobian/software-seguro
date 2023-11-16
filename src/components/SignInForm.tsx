@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 import { userFormSchema } from "@/lib/validations/validations";
 import { sendVerificationRequest } from "@/app/api/auth/authemail";
 
-export function SignUpForm() {
+export function SignInForm() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
