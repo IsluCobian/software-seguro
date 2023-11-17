@@ -10,7 +10,9 @@ import { useRef, useState, useTransition } from "react";
 import { useToast } from "./ui/use-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { validateUser } from "@/lib/actions/actions";
+import { validateToken, validateUser } from "@/lib/actions/actions";
+import { useSearchParams } from "next/navigation";
+import { sendVerificationRequest } from "@/app/api/auth/authemail";
 
 const formSchema = z.object({
   number: z.string().min(1).max(1),
@@ -20,6 +22,8 @@ export function VerificationForm() {
   const [code, setCode] = useState<string>("");
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email");
   const isCodeComplete = code.length === 6;
   const router = useRouter();
 
@@ -30,9 +34,9 @@ export function VerificationForm() {
   const onSubmit = async () => {
     startTransition(async () => {
       try {
-        //const res = await validateUser(data.email, code);
+        const res = await validateToken(email!, code);
 
-        router.refresh();
+        router.push("/dashboard");
       } catch (err) {
         if (err instanceof Error)
           toast({
@@ -47,6 +51,7 @@ export function VerificationForm() {
   const reenviarCodigo = async () => {
     startTransition(async () => {
       try {
+        await sendVerificationRequest(email!);
         reiniciarCodigo();
         toast({
           title: "Codigo reenviado",
@@ -157,7 +162,7 @@ export function VerificationForm() {
   };
 
   return (
-    <div className="h-full items-center w-4/12 bg-white px-7 py-10 md:inset-0">
+    <div className="h-full items-center w-4/12 bg-white px-7 py-12 md:inset-0">
       <button onClick={() => router.back()} className="fixed left-4 top-4">
         <ArrowLeft />
       </button>
@@ -167,6 +172,7 @@ export function VerificationForm() {
         </h1>
         <p className="leading-7 [&:not(:first-child)]:mt-6">
           Te enviamos un codigo a tu correo: <br />
+          {email}
         </p>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -186,17 +192,9 @@ export function VerificationForm() {
                 />
               ))}
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Button
                 variant={"outline"}
-                className="w-full"
-                type="button"
-                onClick={reenviarCodigo}
-              >
-                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Reenviar Código
-              </Button>
-              <Button
                 disabled={!isCodeComplete || isPending}
                 className="w-full"
                 onClick={onSubmit}
@@ -204,6 +202,14 @@ export function VerificationForm() {
               >
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Confirmar
+              </Button>
+              <Button
+                className="w-full underline underline-offset-4"
+                type="button"
+                onClick={reenviarCodigo}
+              >
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Reenviar Código
               </Button>
             </div>
           </form>
