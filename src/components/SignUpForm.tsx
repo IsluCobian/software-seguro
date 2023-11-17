@@ -70,7 +70,7 @@ export function SignUpForm() {
               <FormItem>
                 <FormLabel>Correo Electronico</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input autoComplete="false" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -83,7 +83,7 @@ export function SignUpForm() {
               <FormItem>
                 <FormLabel>Contraseña</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input type="password" autoComplete="false" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
