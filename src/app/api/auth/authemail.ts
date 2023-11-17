@@ -1,6 +1,8 @@
+"use server";
+
 import { createTransport } from "nodemailer";
 import { env } from "@/lib/env.mjs";
-import { InsertToken } from "@/lib/actions/actions";
+import { insertToken } from "@/lib/actions/actions";
 
 function generateVerificationToken() {
   const codeArray = [];
@@ -16,14 +18,15 @@ function generateVerificationToken() {
 }
 
 export async function sendVerificationRequest(identifier: string) {
-  const transport = createTransport({
+  const server = {
     host: env.EMAIL_SERVER_HOST,
-    port: env.EMAIL_SERVER_PORT,
+    port: parseInt(env.EMAIL_SERVER_PORT),
     auth: {
       user: env.EMAIL_SERVER_USER,
       pass: env.EMAIL_SERVER_PASSWORD,
     },
-  });
+  };
+  const transport = createTransport(server);
 
   const token = generateVerificationToken();
 
@@ -40,7 +43,7 @@ export async function sendVerificationRequest(identifier: string) {
       if (err) {
         reject(err);
       } else {
-        InsertToken(identifier, token);
+        insertToken(identifier, token);
         resolve(info);
       }
     });
