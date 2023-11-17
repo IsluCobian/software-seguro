@@ -44,7 +44,7 @@ export function SignUpForm() {
 
         await createUser(data);
         await sendVerificationRequest(data.email);
-        router.replace("/verification?email=" + data.email);
+        router.push("/verification?email=" + data.email);
       } catch (err) {
         if (err instanceof Error)
           toast({

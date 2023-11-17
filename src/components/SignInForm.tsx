@@ -43,7 +43,7 @@ export function SignInForm() {
         data.email = data.email.trim();
         await validateUser(data.email, data.passwd);
         await sendVerificationRequest(data.email);
-        router.replace("/verification?email=" + data.email);
+        router.push("/verification?email=" + data.email);
       } catch (err) {
         if (err instanceof Error)
           toast({

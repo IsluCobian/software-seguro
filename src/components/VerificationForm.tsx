@@ -36,7 +36,7 @@ export function VerificationForm() {
       try {
         const res = await validateToken(email!, code);
 
-        router.push("/dashboard");
+        router.replace("/dashboard");
       } catch (err) {
         if (err instanceof Error)
           toast({
