@@ -1,10 +1,8 @@
 "use server";
 
 import { PrismaClient } from "@prisma/client";
-import { NextApiRequest, NextApiResponse } from "next";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
 import {
   emailSchema,
   passwdSchema,
@@ -22,16 +20,16 @@ export async function savePassword(data: z.infer<typeof passwdSchema>) {
         password: hashedPassword,
       },
     });
-    // Return a success message or some other indicator of success.
-    return { message: "Contraseña guardada exitosamente" };
+    return { message: "Password saved successfully" };
   } catch (e) {
     console.error("Error saving password:", e);
-    throw new Error("No se pudo guardar la contraseña");
+    throw new Error("Unable to save the password");
   }
 }
 
 export async function createUser(data: z.infer<typeof userFormSchema>) {
   const { email, passwd } = data;
+
   const hashedPassword = await bcrypt.hash(passwd, 10);
   try {
     await prisma.user.create({
@@ -40,56 +38,65 @@ export async function createUser(data: z.infer<typeof userFormSchema>) {
         password: hashedPassword,
       },
     });
-    // Return a success message or some other indicator of success.
-    return { message: "Usuario Registrado" };
+    return { message: "User registered successfully" };
   } catch (e) {
-    console.error("Error saving password:", e);
-    throw new Error("No se pudo registrar el usuario");
+    console.error("Error registering user:", e);
+    throw new Error("Unable to register the user");
   }
 }
 
-export async function InsertToken(email: string, token: string) {
+export async function insertToken(email: string, token: string) {
   const hashedToken = await bcrypt.hash(token, 10);
-  try {
-    await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        token: hashedToken,
-      },
-    });
-    // Return a success message or some other indicator of success.
-    return { message: "Usuario Registrado" };
-  } catch (e) {
-    console.error("Error saving password:", e);
-    throw new Error("No se pudo registrar el usuario");
-  }
+  await prisma.user.update({
+    where: {
+      email,
+    },
+    data: {
+      token: hashedToken,
+    },
+  });
+  return { message: "Token inserted successfully" };
 }
 
-export async function validateUser(email: string, token: string) {
-  const hashedToken = await bcrypt.hash(token, 10);
-  try {
-    const query = await prisma.user.findMany({
-      where: {
-        email: email,
-        token: hashedToken,
-      },
-    });
-    if (!query) {
-      throw new Error("No se pudo validar el token");
-    }
+export async function validateUser(email: string, passwd: string) {
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
 
-    await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        isValidated: true,
-      },
-    });
-  } catch (e) {
-    console.error("Error saving password:", e);
-    throw new Error("No se pudo registrar el usuario");
+  if (!user) {
+    throw new Error("Usuario no registrado");
   }
+
+  const checkPassword = bcrypt.compareSync(passwd, user.password);
+
+  if (!checkPassword) throw new Error("Correo o contraseña no validos");
+
+  return { message: "User validated successfully" };
+}
+
+export async function validateToken(email: string, token: string) {
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new Error("No se ha encontrado el usuario");
+  }
+
+  const checkToken = bcrypt.compareSync(token, user.token!);
+
+  if (!checkToken) throw new Error("Token no Valido");
+
+  await prisma.user.update({
+    where: {
+      email: email,
+    },
+    data: {
+      isVerified: true,
+    },
+  });
 }
