@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTransition } from "react";
 import { useToast } from "./ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { createUser } from "@/lib/actions/actions";
 import { useRouter } from "next/navigation";
 import { userFormSchema } from "@/lib/validations/validations";
@@ -58,6 +58,9 @@ export function SignUpForm() {
 
   return (
     <>
+      <button onClick={() => router.push("/")} className="fixed left-4 top-4">
+        <ArrowLeft />
+      </button>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
