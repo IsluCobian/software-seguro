@@ -27,8 +27,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useToast } from "../ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { billSchema } from "@/lib/validations/validations";
-import { Textarea } from "../ui/textarea";
-import { createProduct, getAllProducts } from "@/lib/actions/actions";
+import { getAllProducts } from "@/lib/actions/actions";
 import { Product } from "@prisma/client";
 import {
   Select,
@@ -84,10 +83,8 @@ export function BillsForm() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Añadir Producto</DialogTitle>
-          <DialogDescription>
-            Aqui puedes agregar tus productos
-          </DialogDescription>
+          <DialogTitle>Crear Ticket</DialogTitle>
+          <DialogDescription>Aqui puedes generar tus tickets</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -104,33 +101,48 @@ export function BillsForm() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="products"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descripcion</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.name}
-                  >
+            <div className="flex flex-row space-x-3">
+              <FormField
+                control={form.control}
+                name="buyer"
+                render={({ field }) => (
+                  <FormItem className="flex-none w-12">
+                    <FormLabel>Cant.</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a verified email to display" />
-                      </SelectTrigger>
+                      <Input type="number" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="products"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Descripcion</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.name}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a verified email to display" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {products.map((product) => (
+                          <SelectItem key={product.id} value={product.id}>
+                            {product.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <Button
               disabled={!form.formState.isDirty || isPending}
               className="w-full"

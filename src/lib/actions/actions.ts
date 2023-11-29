@@ -161,6 +161,16 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
   }
 }
 
+export async function deleteProduct(id: string) {
+  try {
+    await prisma.product.delete({
+      where: {
+        id: id,
+      },
+    });
+  } catch (e) {}
+}
+
 //Bills Actions
 export async function getAllBills() {
   const bills = await prisma.bill.findMany({

@@ -30,7 +30,9 @@ export default async function Dashboard() {
       >
         <TabsList>
           <TabsTrigger value="products">Productos</TabsTrigger>
-          <TabsTrigger value="bills">Facturas</TabsTrigger>
+          {userRole !== "USER" && (
+            <TabsTrigger value="bills">Facturas</TabsTrigger>
+          )}
         </TabsList>
         <TabsContent value="products" className="flex w-full flex-col mt-3">
           <ProductsTab role={userRole} />

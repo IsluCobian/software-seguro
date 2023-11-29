@@ -28,14 +28,15 @@ import { Input } from "@/components/ui/input";
 import { useState, useTransition } from "react";
 import { useToast } from "../ui/use-toast";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { productSchema, userFormSchema } from "@/lib/validations/validations";
+import { productSchema } from "@/lib/validations/validations";
 import { Textarea } from "../ui/textarea";
 import { createProduct } from "@/lib/actions/actions";
+import { useRouter } from "next/navigation";
 
 export function ProductForm() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof productSchema>>({
@@ -55,6 +56,7 @@ export function ProductForm() {
           title: "Producto Añadido",
         });
         form.reset();
+        router.refresh();
         setOpen(false);
       } catch (err) {
         if (err instanceof Error)

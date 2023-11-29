@@ -13,7 +13,11 @@ export function LogOutButton() {
   };
 
   return (
-    <Button variant={"destructive"} onClick={onClick}>
+    <Button
+      variant={"destructive"}
+      onClick={onClick}
+      className="hover:text-white"
+    >
       Cerrar sesión
     </Button>
   );

@@ -43,17 +43,19 @@ export function BillsTab({ role }: { role: string }) {
 
   return (
     <>
-      <div className="flex w-full justify-end mb-3">
-        <BillsForm />
-      </div>
+      {role === "ADMIN" && (
+        <div className="flex w-full justify-end mb-3">
+          <BillsForm />
+        </div>
+      )}
       <Table>
-        <TableHeader>
+        <TableHeader className="bg-neutral-100">
           <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Buyer</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead>Total Amount</TableHead>
-            <TableHead>Products</TableHead>
+            <TableHead className="w-[100px]">ID</TableHead>
+            <TableHead>Cliente</TableHead>
+            <TableHead>Fecha</TableHead>
+            <TableHead>Productos</TableHead>
+            <TableHead className="text-right">Total</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -62,7 +64,6 @@ export function BillsTab({ role }: { role: string }) {
               <TableCell>{bill.id}</TableCell>
               <TableCell>{bill.buyer}</TableCell>
               <TableCell>{bill.createdAt.toISOString()}</TableCell>
-              <TableCell>{bill.totalAmount}</TableCell>
               <TableCell>
                 <ul>
                   {bill.products.map((productOnBill) => (
@@ -73,13 +74,14 @@ export function BillsTab({ role }: { role: string }) {
                   ))}
                 </ul>
               </TableCell>
+              <TableCell>{bill.totalAmount}</TableCell>
             </TableRow>
           ))}
         </TableBody>
         {/* Assuming you want to display the total amount of all bills */}
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={3}>Total Amount</TableCell>
+            <TableCell colSpan={4}>Total Amount</TableCell>
             <TableCell className="text-right">
               ${bills.reduce((total, bill) => total + bill.totalAmount, 0)}
             </TableCell>
