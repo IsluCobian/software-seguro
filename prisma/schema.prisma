@@ -11,14 +11,44 @@ datasource db {
 }
 
 model Password {
-  id String @id @default(cuid())
+  id       String @id @default(cuid())
   password String
 }
 
 model User {
-  id String @id @default(cuid())
-  email String @unique
-  password String 
-  token String?
-  isVerified Boolean @default(false)
+  id         String   @id @default(cuid())
+  email      String   @unique
+  password   String
+  role       String   @default("USER")
+  token      String?
+  expires    DateTime @default(now())
+  isVerified Boolean  @default(false)
+}
+
+model Bill {
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  totalAmount Float
+
+  products    ProductOnBill[]
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  description String
+  price       Float
+
+  bills       ProductOnBill[]
+}
+
+model ProductOnBill {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  billId    Int
+  productId String
+
+  // Define foreign keys
+  bill      Bill     @relation(fields: [billId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
