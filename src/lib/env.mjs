@@ -9,6 +9,7 @@ export const env = createEnv({
     EMAIL_SERVER_HOST: z.string().min(1),
     EMAIL_SERVER_PORT: z.string().min(1),
     EMAIL_FROM: z.string().min(1),
+    JWT_SECRET_KEY: z.string().min(1),
   },
   client: {
     // NEXT_PUBLIC_PUBLISHABLE_KEY: z.string().min(1),

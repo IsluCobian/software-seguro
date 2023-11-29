@@ -41,3 +41,25 @@ export const emailSchema = z.object({
   token: z.string(),
   email: z.string().email("Correo electronico no valido"),
 });
+
+export const productSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  price: z.coerce.number(),
+});
+
+// Define a schema for a product on a bill
+const productOnBillSchema = z.object({
+  productId: z.string(),
+  quantity: z.coerce.number(),
+  price: z.coerce.number(),
+});
+
+// Define the main bill schema
+export const billSchema = z.object({
+  id: z.number(),
+  buyer: z.string(),
+  createdAt: z.date(),
+  totalAmount: z.number(),
+  products: z.array(productOnBillSchema),
+});

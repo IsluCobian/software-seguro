@@ -1,13 +1,16 @@
-import Image from "next/image";
-import { PasswordForm } from "@/components/PasswordForm";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+import { PasswordForm } from "@/components/forms/PasswordForm";
 import { MainHeader } from "@/components/header";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default function Home() {
+  const cookieStore = cookies();
+  const session = cookieStore.get("session");
+
+  if (session) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="flex flex-col h-screen">
       <MainHeader />
