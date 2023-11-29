@@ -1,4 +1,4 @@
-import { VerificationForm } from "@/components/VerificationForm";
+import { VerificationForm } from "@/components/forms/VerificationForm";
 
 export default function Verification() {
   return (
