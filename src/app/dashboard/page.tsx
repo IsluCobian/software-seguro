@@ -17,6 +17,7 @@ export default async function Dashboard() {
 
   const decodedToken: any = verify(session.value, env.JWT_SECRET_KEY);
   const userRole = decodedToken.role;
+  const user = decodedToken.email;
 
   return (
     <main className="flex min-h-screen flex-col items-center p-8">
@@ -24,6 +25,7 @@ export default async function Dashboard() {
         <h1 className="text-xl font-bold">Dashboard</h1>
         <LogOutButton />
       </div>
+      {user}
       <Tabs
         defaultValue="products"
         className="flex flex-col mt-5 w-full items-center justify-center"

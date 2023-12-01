@@ -43,6 +43,7 @@ export const emailSchema = z.object({
 });
 
 export const productSchema = z.object({
+  id: z.string(),
   name: z.string(),
   description: z.string(),
   price: z.coerce.number(),

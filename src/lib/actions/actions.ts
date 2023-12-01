@@ -161,6 +161,28 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
   }
 }
 
+export async function updateProduct(
+  id: string,
+  data: z.infer<typeof productSchema>
+) {
+  const { name, description, price } = data;
+  try {
+    await prisma.product.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name: name,
+        description: description,
+        price: price,
+      },
+    });
+    return { message: "Producto Actualizado" };
+  } catch (e) {
+    throw new Error("No se pudo actualizar el producto");
+  }
+}
+
 export async function deleteProduct(id: string) {
   try {
     await prisma.product.delete({

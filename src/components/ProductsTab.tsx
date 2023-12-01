@@ -18,32 +18,55 @@ import { useToast } from "./ui/use-toast";
 
 export function ProductsTab({ role }: { role: string }) {
   const [products, setProducts] = useState<Product[]>([]);
+  const [isProductFormOpen, setProductFormOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null
+  );
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Fetch products from the database
-    const fetchProducts = async () => {
-      const dbProducts = await getAllProducts();
-      setProducts(dbProducts);
-    };
+  const fetchProducts = async () => {
+    const dbProducts = await getAllProducts();
+    setProducts(dbProducts);
+  };
 
+  useEffect(() => {
     fetchProducts();
   }, []);
 
-  const eraseProduct = async (id: string) => {
+  const handleUpdateClick = (id: string) => {
+    setSelectedProductId(id);
+    setProductFormOpen(true);
+  };
+
+  async function handleDeleteClick(id: string) {
     try {
       await deleteProduct(id);
       toast({
         title: "Producto Eliminado",
       });
+      fetchProducts();
     } catch (error) {}
+  }
+
+  const handleProductCreation = () => {
+    fetchProducts();
   };
 
   return (
     <>
       {role === "ADMIN" && (
         <div className="flex w-full justify-end mb-3">
-          <ProductForm />
+          <ProductForm
+            onProductAction={() => {
+              handleProductCreation();
+              setProductFormOpen(false);
+            }}
+            initialValues={
+              selectedProductId
+                ? products.find((product) => product.id === selectedProductId)
+                : undefined
+            }
+          />
         </div>
       )}
       <Table>
@@ -67,10 +90,18 @@ export function ProductsTab({ role }: { role: string }) {
               <TableCell className="text-right">${product.price}</TableCell>
               {role !== "USER" && (
                 <TableCell className="text-white">
-                  <Button size={"sm"} className="bg-red-600">
+                  <Button
+                    size={"sm"}
+                    className="bg-red-600"
+                    onClick={() => handleDeleteClick(product.id)}
+                  >
                     <Trash2 size={16} />
                   </Button>
-                  <Button size={"sm"} className="bg-cyan-600 ml-2">
+                  <Button
+                    size={"sm"}
+                    className="bg-cyan-600 ml-2"
+                    onClick={() => handleUpdateClick(product.id)}
+                  >
                     <PenSquare size={16} />
                   </Button>
                 </TableCell>

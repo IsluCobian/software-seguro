@@ -30,18 +30,24 @@ import { useToast } from "../ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { productSchema } from "@/lib/validations/validations";
 import { Textarea } from "../ui/textarea";
-import { createProduct } from "@/lib/actions/actions";
-import { useRouter } from "next/navigation";
+import { createProduct, updateProduct } from "@/lib/actions/actions";
 
-export function ProductForm() {
+interface ProductFormProps {
+  onProductAction: () => void;
+  initialValues?: z.infer<typeof productSchema>;
+}
+
+export function ProductForm({
+  onProductAction,
+  initialValues,
+}: ProductFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
+    defaultValues: initialValues || {
       name: "",
       description: "",
       price: 0.0,
@@ -51,12 +57,19 @@ export function ProductForm() {
   const onSubmit = async (data: z.infer<typeof productSchema>) => {
     startTransition(async () => {
       try {
-        await createProduct(data);
-        toast({
-          title: "Producto Añadido",
-        });
+        if (initialValues) {
+          await updateProduct(initialValues.id, data);
+          toast({
+            title: "Producto Actualizado",
+          });
+        } else {
+          await createProduct(data);
+          toast({
+            title: "Producto Añadido",
+          });
+        }
         form.reset();
-        router.refresh();
+        onProductAction();
         setOpen(false);
       } catch (err) {
         if (err instanceof Error)
@@ -76,9 +89,13 @@ export function ProductForm() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Añadir Producto</DialogTitle>
+          <DialogTitle>
+            {initialValues ? "Editar Producto" : "Añadir Producto"}
+          </DialogTitle>
           <DialogDescription>
-            Aqui puedes agregar tus productos
+            {initialValues
+              ? "Aquí puedes editar tu producto"
+              : "Aquí puedes agregar tus productos"}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -129,7 +146,7 @@ export function ProductForm() {
               variant="outline"
             >
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Añadir
+              {initialValues ? "Actualizar" : "Añadir"}
             </Button>
           </form>
         </Form>
